@@ -1,8 +1,10 @@
 {% extends "./dashboard_layout.html" %}
 {% block title %}Dev{% endblock %}
 {% block menu %}
+
 <div class="task-navigation">
-  <a class="nav-link active" aria-current="page" href="#">View Daily Assigned Task</a>
+  {% csrf_token %}
+  <button class="nav-link active" aria-current="page" id="view-task-link">View Daily Assigned Task</button>
   <a class="nav-link" href="#">View Assigned Project</a>
   <a class="nav-link" href="#">Status</a>
 </div>
@@ -42,5 +44,44 @@
     </p>
   </div>
   {% endif %}
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js">
+    console.log("aAdf")
+  </script>
+  <script>
+    console.log("adfafa");
+      $(document).ready(function() {
+          $('#view-task-link').click(function(event) {
+              console.log("adfkjads");
+              event.preventDefault();  // Prevent the default link behavior
+              
+              // Get the username
+              // var username = '{{ request.user.username }}';  // Include the Django template variable
+              var username = 'robot';
+              
+              // Make the AJAX request
+              $.ajax({
+                  url: 'http://localhost:8080/view_daily_assigned_task/',  // Replace with the actual API endpoint URL
+                  method: 'POST',  // Or 'GET' if appropriate
+                  headers: {
+                          'X-CSRFToken': '{{ csrf_token }}'
+                      },
+                  data: {
+                      username: username
+                  },
+                  success: function(response) {
+                      // Handle the API response here
+                      console.log('API response:', response);
+                  },
+                  error: function(xhr, status, error) {
+                      console.error('Error calling API:', error);
+                  }
+              });
+          });
+      });
+  </script>
+  
+  
 </div>
+
 {% endblock %}

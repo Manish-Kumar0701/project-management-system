@@ -8,6 +8,10 @@ from .models import Account
 from django.contrib import messages
 from .models import Project
 from django.http import HttpResponseRedirect
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from django.contrib.auth.models import User
+from rest_framework import status
 
 # Create your views here.
 
@@ -106,12 +110,20 @@ def add_project(request):
 
         return render(request, 'add_project.html')
 
-
-# def view_daily_assigned_task(request):
-#     # request should contain username
-#     # use the name to query the database
-#     # fetch user id
-#     # according to user id fetch all the information of the tasks
+@api_view(['POST'])
+def view_daily_assigned_task(request):
+    username = request.data.get('username')
+    
+    try:
+        # Retrieve the user object using the username
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
+    
+    # Now you have the user object, you can access its ID
+    user_id = user.id
+    return Response({'user_id': user_id}, status=status.HTTP_200_OK)
+    
 
 
 
