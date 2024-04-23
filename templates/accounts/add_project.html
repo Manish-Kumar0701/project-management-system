@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Project</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5+z8vwKcGR3fGwEYAdKnsAJi+cWfF1PZ2od++h+a"
+      crossorigin="anonymous"
+    />
+    <style>
+      /* Full-page container */
+      .container-fluid {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f8f9fa; /* Light gray background */
+      }
+
+      /* Form container */
+      .form-card {
+        max-width: 400px;
+        width: 100%;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+        background-color: #fff; /* White background */
+      }
+
+      /* Form header */
+      .form-card h2 {
+        margin-bottom: 30px;
+        color: #333; /* Dark text color */
+      }
+
+      /* Form fields */
+      .form-control {
+        border-color: #ccc; /* Light gray border */
+      }
+
+      /* Submit and cancel buttons */
+      .btn-primary {
+        width: 100%;
+      }
+
+      .btn-danger {
+        width: 100%;
+      }
+
+      /* Additional spacing for form fields */
+      .form-group {
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="form-card">
+        <h2 class="text-center mb-4">Add Project</h2>
+        <form method="post" action="{% url 'add_project' %}">
+          <div class="form-group">
+            {% csrf_token %}
+            <label for="projectName" class="form-label">Project Name</label>
+            <input
+              type="text"
+              class="form-control"
+              name="project_name"
+              id="projectName"
+              placeholder="Enter project name"
+            />
+          </div>
+          <div class="form-group">
+            <label for="createdBy" class="form-label">Created By</label>
+            <input
+              type="text"
+              class="form-control"
+              name="created_by"
+              id="createdBy"
+              placeholder="Enter creator name"
+            />
+          </div>
+          <div class="form-group">
+            <label for="createdAt" class="form-label">Created At</label>
+            <input
+              type="date"
+              class="form-control"
+              name="created_at"
+              id="createdAt"
+            />
+          </div>
+          <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+          <div class="mb-3">
+            <button type="button" class="btn btn-danger">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- Bootstrap JS (optional) -->
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"
+      integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5+z8vwKcGR3fGwEYAdKnsAJi+cWfF1PZ2od++h+a"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %} Login {% endblock %}
+{% block body %}
+<div class="col-5 mx-auto">
+  {% if user.is_authenticated %}
+  <div class="card p-4 bg-light">
+    <p class="card-title">You are already logged in</p>
+  </div>
+  {% else %}
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="card border-0 shadow-lg">
+          <div class="card-body">
+            <h2 class="text-center mb-4">Login</h2>
+            {% if error %}
+            <div class="alert alert-danger" role="alert">
+              {{ error }}
+            </div>
+            {% endif %}
+            <form method="POST">
+              {% csrf_token %}
+              <div class="form-group mb-4">
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  class="form-control form-control-lg rounded-pill"
+                  placeholder="Username"
+                  required
+                />
+              </div>
+              <div class="form-group mb-4">
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  class="form-control form-control-lg rounded-pill"
+                  placeholder="Password"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-primary btn-lg btn-block rounded-pill" style="width: 100%;">Login</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

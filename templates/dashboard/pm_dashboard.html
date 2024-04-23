@@ -1,0 +1,52 @@
+{% extends "./dashboard_layout.html" %} {% block title %}Project Manager{%
+endblock %} {% block menu %}
+<div class="task-navigation">
+  <a class="nav-link active" aria-current="page" href="accounts/add_project.html"
+    >Create Project</a
+  >
+  <a class="nav-link" href="#">Assigned Team Lead</a>
+  <a class="nav-link" href="#">View Activity Log</a>
+  <a class="nav-link" href="#">View Project Status</a>
+  <a class="nav-link" href="#">Create Deadline</a>
+</div>
+{% endblock %} {% endblock %} {% block body %}
+
+<style>
+  /* Custom CSS */
+  .task-navigation .nav-link {
+    transition: color 0.3s ease-in-out;
+    font-weight: bold;
+    color: #333; /* Default text color */
+    font-size: 18px; /* Default font size */
+    padding: 8px 16px; /* Add some padding for better spacing */
+  }
+  .task-navigation .nav-link:hover {
+    color: #007bff; /* Hover text color */
+    text-decoration: none; /* Remove default underline on hover */
+    font-size: 20px; /* Larger font size on hover */
+    border-radius: 4px; /* Add a subtle border radius */
+    background-color: #f8f9fa; /* Light background color on hover */
+  }
+</style>
+
+<div class="container">
+  {% if user.is_authenticated %}
+
+  <div class="float-right">
+    <p>Welcome, {{ user }}</p>
+    {% if user.account %}
+    <p>Role: {{ user.account.get_role_display }}</p>
+    {% endif %}
+  </div>
+
+  {% else %}
+
+  <div class="card p-4 bg-light">
+    <p class="card-title">
+      You are not logged in <a href="/accounts/login">login</a>
+    </p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
