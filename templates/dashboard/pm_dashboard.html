@@ -1,52 +1,225 @@
 {% extends "./dashboard_layout.html" %} {% block title %}Project Manager{%
-endblock %} {% block menu %}
-<div class="task-navigation">
-  <a class="nav-link active" aria-current="page" href="accounts/add_project.html"
-    >Create Project</a
-  >
-  <a class="nav-link" href="#">Assigned Team Lead</a>
-  <a class="nav-link" href="#">View Activity Log</a>
-  <a class="nav-link" href="#">View Project Status</a>
-  <a class="nav-link" href="#">Create Deadline</a>
-</div>
-{% endblock %} {% endblock %} {% block body %}
-
-<style>
-  /* Custom CSS */
-  .task-navigation .nav-link {
-    transition: color 0.3s ease-in-out;
-    font-weight: bold;
-    color: #333; /* Default text color */
-    font-size: 18px; /* Default font size */
-    padding: 8px 16px; /* Add some padding for better spacing */
-  }
-  .task-navigation .nav-link:hover {
-    color: #007bff; /* Hover text color */
-    text-decoration: none; /* Remove default underline on hover */
-    font-size: 20px; /* Larger font size on hover */
-    border-radius: 4px; /* Add a subtle border radius */
-    background-color: #f8f9fa; /* Light background color on hover */
-  }
-</style>
-
-<div class="container">
-  {% if user.is_authenticated %}
-
-  <div class="float-right">
-    <p>Welcome, {{ user }}</p>
-    {% if user.account %}
-    <p>Role: {{ user.account.get_role_display }}</p>
+  endblock %} {% block menu %}
+  <div class="task-navigation">
+  
+    <button class="nav-link active" aria-current="page" id="create-project">Create Project</button>
+  
+    <button class="nav-link active" aria-current="page" id="assigned_lead">Assigned Team Lead</button>
+    <button class="nav-link active" aria-current="page" id="View-log">View Activity Log</button>
+    <button class="nav-link active" aria-current="page" id="view-status">View Project Status</button>
+    <button class="nav-link active" aria-current="page" id="create-deadline">Create Deadline</button>
+  </div>
+  
+  
+  {% endblock %} {% endblock %} {% block body %}
+  
+  <style>
+    /* Custom CSS */
+    .task-navigation .nav-link {
+      transition: color 0.3s ease-in-out;
+      font-weight: bold;
+      color: #333; /* Default text color */
+      font-size: 18px; /* Default font size */
+      padding: 8px 16px; /* Add some padding for better spacing */
+    }
+    .task-navigation .nav-link:hover {
+      color: #007bff; /* Hover text color */
+      text-decoration: none; /* Remove default underline on hover */
+      font-size: 20px; /* Larger font size on hover */
+      border-radius: 4px; /* Add a subtle border radius */
+      background-color: #f8f9fa; /* Light background color on hover */
+    }
+  </style>
+  
+  <div class="container">
+    {% if user.is_authenticated %}
+  
+    <div class="float-right">
+      <p>Welcome, {{ user }}</p>
+      {% if user.account %}
+      <p>Role: {{ user.account.get_role_display }}</p>
+      {% endif %}
+    </div>
+  
+    {% else %}
+  
+    <div class="card p-4 bg-light">
+      <p class="card-title">
+        You are not logged in <a href="/accounts/login">login</a>
+      </p>
+    </div>
     {% endif %}
   </div>
-
-  {% else %}
-
-  <div class="card p-4 bg-light">
-    <p class="card-title">
-      You are not logged in <a href="/accounts/login">login</a>
-    </p>
-  </div>
-  {% endif %}
-</div>
-
-{% endblock %}
+  <!-- script for team lead -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js">
+    console.log("aAdf")
+  </script>
+  <script>
+      $(document).ready(function() {
+          $('#assigned_lead').click(function(event) {
+              console.log("adfkjads");
+              event.preventDefault();  // Prevent the default link behavior
+              
+              // Get the username
+              var username = '{{ request.user.username }}';  // Include the Django template variable
+              // var username = 'robot';
+              
+              // Make the AJAX request
+              $.ajax({
+                  url: 'http://127.0.0.1:8080/assign_team_lead/',  // Replace with the actual API endpoint URL
+                  method: 'POST',  // Or 'GET' if appropriate
+                  headers: {
+                          'X-CSRFToken': '{{ csrf_token }}'
+                      },
+                  data: {
+                      username: username
+                  },
+                  success: function(response) {
+                      // Handle the API response here
+                      console.log('API response:', response);
+                  },
+                  error: function(xhr, status, error) {
+                      console.error('Error calling API:', error);
+                  }
+              });
+          });
+      });
+  </script>
+  
+  <!-- script for create project  -->
+  <script>
+    $(document).ready(function() {
+        $('#create-project').click(function(event) {
+            console.log("adfkjads");
+            event.preventDefault();  // Prevent the default link behavior
+            
+            // Get the username
+            var username = '{{ request.user.username }}';  // Include the Django template variable
+            // var username = 'robot';
+            
+            // Make the AJAX request
+            $.ajax({
+                url: 'http://127.0.0.1:8080/create_project/',  // Replace with the actual API endpoint URL
+                method: 'POST',  // Or 'GET' if appropriate
+                headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                data: {
+                    username: username
+                },
+                success: function(response) {
+                    // Handle the API response here
+                    console.log('API response:', response);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error calling API:', error);
+                }
+            });
+        });
+    });
+  </script>
+  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- script for activity-log -->
+  <script>
+     $(document).ready(function() {
+      $('#view-log').click(function(event) {
+          console.log("Click event triggered");  // Debugging line
+          event.preventDefault();  // Prevent the default link behavior
+          
+          // Get the username
+          var username = '{{ request.user.username }}';  // Include the Django template variable
+          
+          // Make the AJAX request
+          $.ajax({
+              url: 'http://127.0.0.1:8080/view_activity_log/',  //   API endpoint URL
+              method: 'GET',  
+              headers: {
+                      'X-CSRFToken': '{{ csrf_token }}'
+                  },
+              data: {
+                  username: username
+              },
+              success: function(response) {
+                  console.log('API response:', response); 
+              },
+              error: function(xhr, status, error) {
+                  console.error('Error calling API:', error);  
+              }
+          });
+      });
+  });
+    </script>
+  
+  <!-- script for view_status -->
+  <script>
+    $(document).ready(function() {
+        $('#view-status').click(function(event) {
+            console.log("adfkjads");
+            event.preventDefault();  // Prevent the default link behavior
+            
+            // Get the username
+            var username = '{{ request.user.username }}';  // Include the Django template variable
+            // var username = 'robot';
+            
+            // Make the AJAX request
+            $.ajax({
+                url: 'http://127.0.0.1:8080/view_pm_dashboard_status/',  // Replace with the actual API endpoint URL
+                method: 'GET',  // Or 'GET' if appropriate
+                headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                data: {
+                    username: username
+                },
+                success: function(response) {
+                    // Handle the API response here
+                    console.log('API response:', response);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error calling API:', error);
+                }
+            });
+        });
+    });
+  </script>
+  
+  <!-- script for Creating deadline -->
+  
+  <script>
+  $(document).ready(function() {
+        $('#create-deadline').click(function(event) {
+            console.log("adfkjads");
+            event.preventDefault();  // Prevent the default link behavior
+            
+            // Get the username
+            var username = '{{ request.user.username }}';  // Include the Django template variable
+            // var username = 'robot';
+            
+            // Make the AJAX request
+            $.ajax({
+                url: 'http://127.0.0.1:8080/create_deadline/',  // Replace with the actual API endpoint URL
+                method: 'POST',  // Or 'GET' if appropriate
+                headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                data: {
+                    username: username
+                },
+                success: function(response) {
+                    // Handle the API response here
+                    console.log('API response:', response);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error calling API:', error);
+                }
+            });
+        });
+    });
+  
+  </script>
+  
+  
+  {% endblock %}
+  
