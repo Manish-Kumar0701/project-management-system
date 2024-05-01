@@ -1,54 +1,140 @@
-{% extends "./dashboard_layout.html" %} {% block title %}Project Manager{%
-  endblock %} {% block menu %}
-  <div class="task-navigation">
-    <a class="nav-link active" aria-current="page" href="#">View All Project Status</a>
-    <a class="nav-link" href="#">Project Individual Value</a>
-  </div>
-  {% endblock %}
-  
-  
-  
-  {% endblock %}
-   {% block body %}
-  
-   <style>
-      /* Custom CSS */
-      .task-navigation .nav-link {
-        transition: color 0.3s ease-in-out;
-        font-weight: bold;
-        color: #333; /* Default text color */
-        font-size: 18px; /* Default font size */
-        padding: 8px 16px; /* Add some padding for better spacing */
-      }
-      .task-navigation .nav-link:hover {
-        color: #007bff; /* Hover text color */
-        text-decoration: none; /* Remove default underline on hover */
-        font-size: 20px; /* Larger font size on hover */
-        border-radius: 4px; /* Add a subtle border radius */
-        background-color: #f8f9fa; /* Light background color on hover */
-      }
-    </style>
-  
-  
-  <div class="container">
+{% extends "./dashboard_layout.html" %}
+
+{% block title %}
+BOD
+{% endblock %}
+
+{% block menu %}
+<div class="task-navigation">
+    <button class="nav-link active" aria-current="page" id="view-all">View All Project Status</button>
+</div>
+{% endblock %}
+
+{% block body %}
+<div class="container">
     {% if user.is_authenticated %}
-  
-    <div class="float-right">
-      <p>Welcome, {{ user }}</p>
-      {% if user.account %}
-      <p>Role: {{ user.account.get_role_display }}</p>
-      {% endif %}
+    <div class="float-right user-info">
+        <p>Welcome, {{ user }}</p>
+        {% if user.account %}
+        <p>Role: {{ user.account.get_role_display }}</p>
+        {% endif %}
     </div>
-  
     {% else %}
-  
     <div class="card p-4 bg-light">
-      <p class="card-title">
-        You are not logged in <a href="/accounts/login">login</a>
-      </p>
+        <p class="card-title">You are not logged in <a href="/accounts/login">login</a></p>
     </div>
     {% endif %}
-  </div>
-  
-  {% endblock %}
-  
+</div>
+
+<style>
+    /* Custom CSS */
+    .task-navigation .nav-link {
+        transition: color 0.3s ease-in-out;
+        font-weight: bold;
+        color: #333;
+        font-size: 18px;
+        padding: 8px 16px;
+    }
+
+    .task-navigation .nav-link:hover {
+        color: #007bff;
+        text-decoration: none;
+        font-size: 20px;
+        border-radius: 4px;
+        background-color: #f8f9fa;
+    }
+
+    .user-info {
+        background-color: #f2f2f2;
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-info p {
+        margin: 0;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+</style>
+
+<div class="container" id="projects-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Project Name</th>
+                <th>Status</th>
+                <th>Task Title</th>
+                <th>Assigned To</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be inserted here dynamically -->
+        </tbody>
+    </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Make an AJAX request to retrieve user information
+        $.ajax({
+            url: '/get_user_info/',
+            method: 'GET',
+            success: function(response) {
+                var username = response.username;
+                var role = response.role;
+                $('#myModal').modal('show');
+                $('#modalContent').html('Welcome, ' + username + '<br>Role: ' + role);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error retrieving user information:', error);
+            }
+        });
+
+        $('#view-all').click(function(event) {
+            event.preventDefault();
+            var username = '{{ request.user.username }}';
+
+            $.ajax({
+                url: 'http://127.0.0.1:8080/view_all_project_details/',
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                data: {
+                    username: username
+                },
+                success: function(response) {
+                    $('#projects-container tbody').empty();
+                    response.project_details.forEach(function(project) {
+                        var row = $('<tr>');
+                        row.append($('<td>').text(project.project_name));
+                        row.append($('<td>').text(project.status));
+                        row.append($('<td>').text(project.task_title));
+                        row.append($('<td>').text(project.assigned_to));
+                        $('#projects-container tbody').append(row);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error calling API:', error);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

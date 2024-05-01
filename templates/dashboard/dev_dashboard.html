@@ -5,8 +5,9 @@
 <div class="task-navigation">
   {% csrf_token %}
   <button class="nav-link active" aria-current="page" id="view-task-link">View Daily Assigned Task</button>
-  <a class="nav-link" href="#">View Assigned Project</a>
-  <a class="nav-link" href="#">Status</a>
+  <button class="nav-link active" aria-current="page" id="view-project-link">View Assigned Projects </button>
+  <button class="nav-link active" aria-current="page" id="view-status-link"> Status </button>
+  
 </div>
 {% endblock %}
 {% block body %}
@@ -45,20 +46,23 @@
   </div>
   {% endif %}
 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js">  
+  <!-- view_daily_assigned_task -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js">
+    console.log("aAdf")
   </script>
   <script>
       $(document).ready(function() {
           $('#view-task-link').click(function(event) {
+              console.log("adfkjads");
               event.preventDefault();  // Prevent the default link behavior
               
               // Get the username
-              // var username = '{{ request.user.username }}';  // Include the Django template variable
-              var username = 'robot';
+              var username = '{{ request.user.username }}';  // Include the Django template variable
+              // var username = 'robot';
               
               // Make the AJAX request
               $.ajax({
-                  url: 'http://localhost:8080/view_daily_assigned_task/',  // Replace with the actual API endpoint URL
+                  url: 'http://127.0.0.1:8080/view_daily_assigned_task/',  // Replace with the actual API endpoint URL
                   method: 'POST',  // Or 'GET' if appropriate
                   headers: {
                           'X-CSRFToken': '{{ csrf_token }}'
@@ -77,8 +81,77 @@
           });
       });
   </script>
-  
-  
+
+<!-- view_assigned_projects -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js">
+</script>
+<script>
+$(document).ready(function() {
+    $(document).on('click', '#view-project-link', function(event) {
+        console.log("Viewing assigned projects");
+        event.preventDefault(); // Prevent the default link behavior
+        
+        // Get the username
+        var username = '{{ request.user.username }}'; // Include the Django template variable
+        
+        // Make the AJAX request
+        $.ajax({
+            url: 'http://127.0.0.1:8080/view_assigned_projects/', 
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            data: {
+                username: username
+            },
+            success: function(response) {
+                // Handle the API response here
+                console.log('API response:', response);
+                // You can now use the response to update your UI
+            },
+            error: function(xhr, status, error) {
+                console.error('Error calling API:', error);
+            }
+        });
+    });
+});
+  </script>
+
+
+<!-- View_status_script -->
+<script>
+  $(document).ready(function() {
+      $(document).on('click', '#view-status-link', function(event) {
+          console.log("Viewing assigned projects");
+          event.preventDefault(); // Prevent the default link behavior
+          
+          // Get the username
+          var username = '{{ request.user.username }}'; // Include the Django template variable
+          
+          // Make the AJAX request
+          $.ajax({
+              url: 'http://127.0.0.1:8080/view_project_status/', 
+              method: 'POST',
+              headers: {
+                  'X-CSRFToken': '{{ csrf_token }}'
+              },
+              data: {
+                  username: username
+              },
+              success: function(response) {
+                  // Handle the API response here
+                  console.log('API response:', response);
+                  // You can now use the response to update your UI
+              },
+              error: function(xhr, status, error) {
+                  console.error('Error calling API:', error);
+              }
+          });
+      });
+  });
+    </script>
+
 </div>
 
 {% endblock %}
