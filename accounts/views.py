@@ -18,32 +18,36 @@ from rest_framework import status
 
 # Create your views here.
 
+from django.contrib.auth import authenticate, login, REDIRECT_FIELD_NAME
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.urls import reverse
+from.models import Account  # Assuming Account model has a role field
+
 def login_view(request):
     if request.user.is_authenticated:
-        return render(request,'accounts/login.html') 
+        return render(request, 'accounts/login.html')  # Assuming you have a dashboard template for authenticated users
+
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            # Get the role of the logged-in user
             try:
                 account = Account.objects.get(user=user)
                 role = account.role
-                # Redirect based on role
-                if role:
-                    if Account.DEVELOPER:
-                        return redirect('dev_dashboard')
-                    elif Account.PROJECT_MANAGER:
-                        return redirect('pm_dashboard')
-                    elif Account.BOD:
-                        return redirect('bod_dashboard')
-                    elif Account.COO:
-                        return redirect('coo_dashboard')
-                    # elif _ :
-                    #     # Default case if none of the above matches
-                    #     return redirect('default_dashboard')
+                if role == Account.DEVELOPER:
+                    return redirect('dev_dashboard')
+                elif role == Account.PROJECT_MANAGER:
+                    return redirect('pm_dashboard')
+                elif role == Account.BOD:
+                    return redirect('bod_dashboard')
+                elif role == Account.COO:
+                    return redirect('coo_dashboard')
+                else:
+                    messages.error(request, "Your role does not have a dashboard.")
+                    return redirect('login')
             except Account.DoesNotExist:
                 messages.error(request, "User account not found.")
                 return redirect('login')
@@ -52,6 +56,7 @@ def login_view(request):
             return redirect('login')
     else:
         return render(request, 'accounts/login.html')
+
 
 def user_logout(request):
     logout(request)
@@ -113,9 +118,13 @@ def add_project(request):
 
         return render(request, 'add_project.html')
 
-@api_view(['POST'])
+
+
+#api_view for View_daily_assigned_task
+
+@api_view(['GET'])
 def view_daily_assigned_task(request):
-    username = request.data.get('username')
+    username = request.user.username  # Get the username of the logged-in user
     
     try:
         # Retrieve the user object using the username
@@ -131,18 +140,22 @@ def view_daily_assigned_task(request):
     
     # Iterate over the assigned tasks to get the project names
     for task in assigned_tasks:
-        project_name = task.project_id.project_name
-        task_title = task.task_id.title
+        project_name = task.project_id.project_name  # Ensure this attribute exists in your Project model
+        task_title = task.task_id.title  # Ensure this attribute exists in your Task model
         projects_and_tasks.append({'project_name': project_name, 'task_title': task_title})
     
     # Return the response including the username and the list of projects and tasks
     return Response({'username': username, 'projects_and_tasks': projects_and_tasks}, status=status.HTTP_200_OK)
 
 
+
+
+
 #view_assign_project_views
-@api_view(['POST'])
+
+@api_view(['GET'])
 def view_assigned_projects(request):
-    username = request.data.get('username') 
+    username = request.user.username  # Get the username of the logged-in user
     
     try:
         # Retrieve the user object using the username
@@ -165,11 +178,11 @@ def view_assigned_projects(request):
     return Response({'username': username, 'assigned_projects': list(assigned_projects)}, status=status.HTTP_200_OK)
 
 
-
 #view_project_status_api
-@api_view(['POST'])
+@api_view(['GET'])
 def view_project_status(request):
-    username = request.data.get('username')
+    # Retrieve the username from the logged-in user
+    username = request.user.username
 
     try:
         # Retrieve the user object using the username

@@ -1,13 +1,11 @@
 {% extends "./dashboard_layout.html" %}
 {% block title %}Dev{% endblock %}
 {% block menu %}
-
 <div class="task-navigation">
   {% csrf_token %}
   <button class="nav-link active" aria-current="page" id="view-task-link">View Daily Assigned Task</button>
-  <button class="nav-link active" aria-current="page" id="view-project-link">View Assigned Projects </button>
+  <button class="nav-link active" aria-current="page" id="view-project-link">View Assigned Projects</button>
   <button class="nav-link active" aria-current="page" id="view-status-link"> Status </button>
-  
 </div>
 {% endblock %}
 {% block body %}
@@ -26,6 +24,21 @@
     font-size: 20px; /* Larger font size on hover */
     border-radius: 4px; /* Add a subtle border radius */
     background-color: #f8f9fa; /* Light background color on hover */
+  }
+  
+  /* Table Styles */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  th {
+    background-color: #f2f2f2;
   }
 </style>
 
@@ -46,85 +59,105 @@
   </div>
   {% endif %}
 
-  <!-- view_daily_assigned_task -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js">
-    console.log("aAdf")
-  </script>
-  <script>
-      $(document).ready(function() {
-          $('#view-task-link').click(function(event) {
-              console.log("adfkjads");
-              event.preventDefault();  // Prevent the default link behavior
-              
-              // Get the username
-              var username = '{{ request.user.username }}';  // Include the Django template variable
-              // var username = 'robot';
-              
-              // Make the AJAX request
-              $.ajax({
-                  url: 'http://127.0.0.1:8080/view_daily_assigned_task/',  // Replace with the actual API endpoint URL
-                  method: 'POST',  // Or 'GET' if appropriate
-                  headers: {
-                          'X-CSRFToken': '{{ csrf_token }}'
-                      },
-                  data: {
-                      username: username
-                  },
-                  success: function(response) {
-                      // Handle the API response here
-                      console.log('API response:', response);
-                  },
-                  error: function(xhr, status, error) {
-                      console.error('Error calling API:', error);
-                  }
-              });
-          });
-      });
-  </script>
+  <!-- Display projects and tasks -->
+  <div id="projects-and-tasks">
+    <!-- Projects and tasks will be dynamically added here -->
+  </div>
+</div>
 
-<!-- view_assigned_projects -->
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js">
-</script>
+<!-- Script Block -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-$(document).ready(function() {
-    $(document).on('click', '#view-project-link', function(event) {
-        console.log("Viewing assigned projects");
-        event.preventDefault(); // Prevent the default link behavior
-        
-        // Get the username
-        var username = '{{ request.user.username }}'; // Include the Django template variable
-        
-        // Make the AJAX request
-        $.ajax({
-            url: 'http://127.0.0.1:8080/view_assigned_projects/', 
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            data: {
-                username: username
-            },
-            success: function(response) {
-                // Handle the API response here
-                console.log('API response:', response);
-                // You can now use the response to update your UI
-            },
-            error: function(xhr, status, error) {
-                console.error('Error calling API:', error);
-            }
-        });
+  $(document).ready(function() {
+    $('#view-task-link').click(function(event) {
+      event.preventDefault();  // Prevent the default link behavior
+              
+      // Make the AJAX request
+      $.ajax({
+        url: 'http://127.0.0.1:8080/view_daily_assigned_task/',  // Replace with the actual API endpoint URL
+        method: 'GET',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+          // Handle the API response here
+          console.log('API response:', response);
+          
+          // Clear existing content in the container
+          $('#projects-and-tasks').empty();
+          
+          // Create table
+          var table = $('<table>');
+          var thead = $('<thead>').append('<tr><th>Project Name</th><th>Task Title</th></tr>');
+          table.append(thead);
+          var tbody = $('<tbody>');
+          
+          // Iterate over the projects and tasks and create table rows
+          response.projects_and_tasks.forEach(function(item) {
+            var row = $('<tr>').append('<td>' + item.project_name + '</td><td>' + item.task_title + '</td>');
+            tbody.append(row);
+          });
+          
+          table.append(tbody);
+          $('#projects-and-tasks').append(table);
+        },
+        error: function(xhr, status, error) {
+          console.error('Error calling API:', error);
+        }
+      });
     });
-});
-  </script>
-
+    
+    $('#view-project-link').click(function(event) {
+      event.preventDefault(); // Prevent the default link behavior
+      
+      // Make the AJAX request
+      $.ajax({
+        url: 'http://127.0.0.1:8080/view_assigned_projects/', 
+        method: 'GET',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+          // Handle the API response here
+          console.log('API response:', response);
+          
+          // Clear existing content in the container
+          $('#projects-and-tasks').empty();
+          
+          // Create table
+          var table = $('<table>');
+          var thead = $('<thead>').append('<tr><th>Assigned Projects</th></tr>');
+          table.append(thead);
+          var tbody = $('<tbody>');
+          
+          // Iterate over the assigned projects and create table rows
+          response.assigned_projects.forEach(function(project) {
+            var row = $('<tr>').append('<td>' + project + '</td>');
+            tbody.append(row);
+          });
+          
+          table.append(tbody);
+          $('#projects-and-tasks').append(table);
+        },
+        error: function(xhr, status, error) {
+          console.error('Error calling API:', error);
+        }
+      });
+    });
+  });
+</script>
 
 <!-- View_status_script -->
+
 <script>
   $(document).ready(function() {
       $(document).on('click', '#view-status-link', function(event) {
-          console.log("Viewing assigned projects");
+          console.log("Viewing project status");
           event.preventDefault(); // Prevent the default link behavior
+          
+          // Clear existing content
+          $('#project-statuses').empty();
           
           // Get the username
           var username = '{{ request.user.username }}'; // Include the Django template variable
@@ -132,7 +165,7 @@ $(document).ready(function() {
           // Make the AJAX request
           $.ajax({
               url: 'http://127.0.0.1:8080/view_project_status/', 
-              method: 'POST',
+              method: 'GET',
               headers: {
                   'X-CSRFToken': '{{ csrf_token }}'
               },
@@ -142,16 +175,39 @@ $(document).ready(function() {
               success: function(response) {
                   // Handle the API response here
                   console.log('API response:', response);
-                  // You can now use the response to update your UI
+                  
+                  // Update the UI with project statuses
+                  displayProjectStatuses(response.project_statuses);
               },
               error: function(xhr, status, error) {
                   console.error('Error calling API:', error);
+                  console.error('Status:', status);
+                  console.error('Response:', xhr.responseText);
               }
           });
       });
+      
+      // Function to display project statuses in the UI
+      function displayProjectStatuses(projectStatuses) {
+          // Create table header
+          var table = $('<table>').addClass('table');
+          var thead = $('<thead>').appendTo(table);
+          var headerRow = $('<tr>').appendTo(thead);
+          $('<th>').text('Project Name').appendTo(headerRow);
+          $('<th>').text('Status').appendTo(headerRow);
+          
+          // Create table body
+          var tbody = $('<tbody>').appendTo(table);
+          projectStatuses.forEach(function(status) {
+              var row = $('<tr>').appendTo(tbody);
+              $('<td>').text(status.project_name).appendTo(row);
+              $('<td>').text(status.status).appendTo(row); // Assuming status is numeric
+          });
+          
+          // Append table to the container
+          $('#project-statuses').append(table);
+      }
   });
-    </script>
+</script>
 
-</div>
-
-{% endblock %}
+{%endblock%}
