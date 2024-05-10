@@ -15,6 +15,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from rest_framework import status
+from rest_framework import status as http_status
+
 
 # Create your views here.
 
@@ -246,23 +248,22 @@ def create_project(request):
         
         # Check if project_name and created_by_id are provided
         if not project_name or not created_by_id:
-            return Response({'error': 'Both project_name and created_by are required.'}, status=get_stats.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Both project_name and created_by are required.'}, status=http_status.HTTP_400_BAD_REQUEST)
         
         # Check if the user exists
         created_by = User.objects.filter(id=created_by_id).first()
         if not created_by:
-            return Response({'error': 'User with the provided created_by ID does not exist.'}, status=get_stats.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'User with the provided created_by ID does not exist.'}, status=http_status.HTTP_400_BAD_REQUEST)
         
         # Create the project
         project = Project.objects.create(project_name=project_name, created_by=created_by, status=status)
-        return Response({'project_id': project.id}, status=get_stats.HTTP_201_CREATED)
+        return Response({'project_id': project.id}, status=http_status.HTTP_201_CREATED)
     
     except IntegrityError as e:
-        return Response({'error': str(e)}, status=get_stats.HTTP_400_BAD_REQUEST)
+        return Response({'error': str(e)}, status=http_status.HTTP_400_BAD_REQUEST)
     
     except Exception as e:
-        return Response({'error': str(e)}, status=get_stats.HTTP_500_INTERNAL_SERVER_ERROR)
-
+        return Response({'error': str(e)}, status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # Api_view for Assign_lead

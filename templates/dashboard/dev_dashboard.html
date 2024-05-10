@@ -63,6 +63,7 @@
   <div id="projects-and-tasks">
     <!-- Projects and tasks will be dynamically added here -->
   </div>
+  <div id="project-statuses"></div>
 </div>
 
 
@@ -156,21 +157,18 @@
           console.log("Viewing project status");
           event.preventDefault(); // Prevent the default link behavior
           
+          // Hide other sections
+          $('#projects-and-tasks').hide();
+          
           // Clear existing content
           $('#project-statuses').empty();
-          
-          // Get the username
-          var username = '{{ request.user.username }}'; // Include the Django template variable
           
           // Make the AJAX request
           $.ajax({
               url: 'http://127.0.0.1:8080/view_project_status/', 
               method: 'GET',
               headers: {
-                  'X-CSRFToken': '{{ csrf_token }}'
-              },
-              data: {
-                  username: username
+                  'X-CSRFToken': 'your_csrf_token_here' // Replace 'your_csrf_token_here' with the actual CSRF token
               },
               success: function(response) {
                   // Handle the API response here
@@ -178,6 +176,9 @@
                   
                   // Update the UI with project statuses
                   displayProjectStatuses(response.project_statuses);
+                  
+                  // Show the project statuses section
+                  $('#project-statuses').show();
               },
               error: function(xhr, status, error) {
                   console.error('Error calling API:', error);
